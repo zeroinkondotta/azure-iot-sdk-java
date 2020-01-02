@@ -73,14 +73,14 @@ public class DigitalTwinServiceClientE2ETests {
         assertThat(modelString).contains(String.format("\"@id\":\"%s\"", TEST_INTERFACE_ID));
     }
 
-    // TODO: Autorest currently does not throw Exception for GET 404 status
-    @Test (expected = NoSuchElementException.class)
+    // Service throws a 404 Not Found
+    @Test (expected = RestException.class)
     public void testGetModelInformationInvalidModelUrn() {
         digitalTwinServiceClient.getModel(INVALID_MODEL_URN);
     }
 
-    // TODO: Autorest currently does not throw Exception for GET 404 status
-    @Test (expected = NoSuchElementException.class)
+    // Service throws a 404 Not Found
+    @Test (expected = RestException.class)
     public void testGetModelInformationInvalidInterfaceUrn() {
         digitalTwinServiceClient.getModel(INVALID_INTERFACE_URN);
     }
@@ -95,8 +95,8 @@ public class DigitalTwinServiceClientE2ETests {
         assertThat(digitalTwin).contains(expectedInterface);
     }
 
-    // TODO: Autorest currently does not throw Exception for GET 404 status
-    @Test (expected = NoSuchElementException.class)
+    // Service throws a 404 Not Found
+    @Test (expected = RestException.class)
     public void testGetAllDigitalTwinInterfacesInvalidDigitalTwinId() {
         digitalTwinServiceClient.getDigitalTwin(INVALID_DEVICE_ID);
     }

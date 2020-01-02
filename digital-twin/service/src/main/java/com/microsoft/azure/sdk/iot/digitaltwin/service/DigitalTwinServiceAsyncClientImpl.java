@@ -16,7 +16,10 @@ import com.microsoft.azure.sdk.iot.digitaltwin.service.generated.models.DigitalT
 import com.microsoft.azure.sdk.iot.digitaltwin.service.generated.models.DigitalTwinInvokeInterfaceCommandHeaders;
 import com.microsoft.azure.sdk.iot.digitaltwin.service.models.DigitalTwinCommandResponse;
 import com.microsoft.rest.RestClient;
+import com.microsoft.rest.RestException;
 import com.microsoft.rest.ServiceResponseBuilder;
+import com.microsoft.rest.protocol.ResponseBuilder;
+import com.microsoft.rest.protocol.SerializerAdapter;
 import com.microsoft.rest.serializer.JacksonAdapter;
 import lombok.Builder;
 import lombok.NonNull;
@@ -61,9 +64,18 @@ public final class DigitalTwinServiceAsyncClientImpl implements DigitalTwinServi
     }
 
     private void init(SasTokenProvider sasTokenProvider, String httpsEndpoint) {
+
+        ResponseBuilder.Factory serviceResponseFactory = new ResponseBuilder.Factory() {
+            @Override
+            public <T, E extends RestException> ResponseBuilder<T, E> newInstance(SerializerAdapter<?> serializerAdapter) {
+                return new ServiceResponseBuilder.Factory().<T, E>newInstance(serializerAdapter)
+                        .withThrowOnGet404(true);
+            }
+        };
+
         RestClient simpleRestClient = new RestClient.Builder().withBaseUrl(httpsEndpoint)
                                                               .withCredentials(new ServiceClientCredentialsProvider(sasTokenProvider))
-                                                              .withResponseBuilderFactory(new ServiceResponseBuilder.Factory())
+                                                              .withResponseBuilderFactory(serviceResponseFactory)
                                                               .withSerializerAdapter(new JacksonAdapter())
                                                               .build();
 

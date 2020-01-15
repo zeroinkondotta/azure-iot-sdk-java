@@ -5,7 +5,10 @@
 
 package com.microsoft.azure.sdk.iot.common.tests.provisioning;
 
-import com.microsoft.azure.sdk.iot.common.helpers.*;
+import com.microsoft.azure.sdk.iot.common.helpers.ConditionalIgnoreRule;
+import com.microsoft.azure.sdk.iot.common.helpers.CorrelationDetailsLoggingAssert;
+import com.microsoft.azure.sdk.iot.common.helpers.StandardTierOnlyRule;
+import com.microsoft.azure.sdk.iot.common.helpers.Tools;
 import com.microsoft.azure.sdk.iot.common.setup.provisioning.ProvisioningCommon;
 import com.microsoft.azure.sdk.iot.deps.twin.DeviceCapabilities;
 import com.microsoft.azure.sdk.iot.device.DeviceClient;
@@ -15,10 +18,11 @@ import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
 import com.microsoft.azure.sdk.iot.device.IotHubEventCallback;
 import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
 import com.microsoft.azure.sdk.iot.provisioning.device.ProvisioningDeviceClientTransportProtocol;
+import com.microsoft.azure.sdk.iot.provisioning.security.SecurityProvider;
+import com.microsoft.azure.sdk.iot.provisioning.security.SecurityProviderTpm;
+import com.microsoft.azure.sdk.iot.provisioning.security.exceptions.SecurityProviderException;
 import com.microsoft.azure.sdk.iot.provisioning.security.hsm.SecurityProviderTPMEmulator;
-import com.microsoft.azure.sdk.iot.provisioning.service.configs.AllocationPolicy;
-import com.microsoft.azure.sdk.iot.provisioning.service.configs.CustomAllocationDefinition;
-import com.microsoft.azure.sdk.iot.provisioning.service.configs.ReprovisionPolicy;
+import com.microsoft.azure.sdk.iot.provisioning.service.configs.*;
 import com.microsoft.azure.sdk.iot.provisioning.service.exceptions.ProvisioningServiceClientException;
 import com.microsoft.azure.sdk.iot.service.IotHubConnectionString;
 import com.microsoft.azure.sdk.iot.service.RegistryManager;
@@ -168,6 +172,34 @@ public class ProvisioningTests extends ProvisioningCommon
     public void individualEnrollmentWithCustomAllocationPolicy() throws Exception
     {
         customAllocationFlow(EnrollmentType.INDIVIDUAL);
+    }
+
+    @Test
+    public void individualEnrollmentGetAttestationMechanismTPM() throws ProvisioningServiceClientException, SecurityProviderException
+    {
+        //This test fits in better with the other provisioning service client tests, but it needs to be run sequentially
+        // with the other TPM tests, so it lives here with them
+        if (testInstance.attestationType != AttestationType.TPM)
+        {
+            return;
+        }
+
+        if (testInstance.protocol != HTTPS)
+        {
+            //The test protocol has no bearing on this test since it only uses the provisioning service client, so the test should only run once.
+            return;
+        }
+
+        SecurityProvider securityProvider = new SecurityProviderTPMEmulator(testInstance.registrationId, MAX_TPM_CONNECT_RETRY_ATTEMPTS);
+        Attestation attestation = new TpmAttestation(new String(com.microsoft.azure.sdk.iot.deps.util.Base64.encodeBase64Local(((SecurityProviderTpm) securityProvider).getEndorsementKey())));
+        IndividualEnrollment individualEnrollment = new IndividualEnrollment(testInstance.registrationId, attestation);
+        provisioningServiceClient.createOrUpdateIndividualEnrollment(individualEnrollment);
+
+        AttestationMechanism retrievedAttestationMechanism = provisioningServiceClient.getIndividualEnrollmentAttestationMechanism(testInstance.registrationId);
+        assertEquals(retrievedAttestationMechanism.getType(), AttestationMechanismType.TPM);
+        assertTrue(retrievedAttestationMechanism.getAttestation() instanceof TpmAttestation);
+        TpmAttestation retrievedTpmAttestation = (TpmAttestation) retrievedAttestationMechanism.getAttestation();
+        assertNotNull(retrievedTpmAttestation.getEndorsementKey());
     }
 
     /***

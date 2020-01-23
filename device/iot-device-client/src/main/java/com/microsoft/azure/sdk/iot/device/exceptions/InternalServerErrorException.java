@@ -30,6 +30,11 @@ public class InternalServerErrorException extends IotHubServiceException
     }
 
     @Override
+    public boolean isRetryable() {
+        return true;
+    }
+
+    @Override
     public IotHubStatusCode getStatusCode()
     {
         return IotHubStatusCode.INTERNAL_SERVER_ERROR;

@@ -35,4 +35,9 @@ public class AmqpLinkStolenException extends ProtocolException
     {
         super(cause);
     }
+
+    @Override
+    public boolean isRetryable() {
+        return true;
+    }
 }

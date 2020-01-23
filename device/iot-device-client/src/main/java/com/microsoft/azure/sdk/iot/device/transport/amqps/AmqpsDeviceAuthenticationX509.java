@@ -84,7 +84,13 @@ public class AmqpsDeviceAuthenticationX509 extends AmqpsDeviceAuthentication
         catch (IOException e)
         {
             log.warn("setSslDomain has thrown exception", e);
-            throw new TransportException(e);
+            throw new TransportException(e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
 
         // Codes_SRS_AMQPSDEVICEAUTHENTICATIONX509_12_011: [The function shall set the domain on the transport.]
@@ -94,7 +100,13 @@ public class AmqpsDeviceAuthenticationX509 extends AmqpsDeviceAuthentication
     @Override
     protected void authenticate(DeviceClientConfig deviceClientConfig, UUID correlationId) throws TransportException
     {
-        throw new TransportException("Cannot authenticate on demand with x509 auth");
+        throw new TransportException("Cannot authenticate on demand with x509 auth") {
+
+            @Override
+            public boolean isRetryable() {
+                return false;
+            }
+        };
     }
 
     @Override

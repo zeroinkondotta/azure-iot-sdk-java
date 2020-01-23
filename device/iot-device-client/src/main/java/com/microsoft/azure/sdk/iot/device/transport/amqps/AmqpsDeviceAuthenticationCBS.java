@@ -209,7 +209,13 @@ public final class AmqpsDeviceAuthenticationCBS extends AmqpsDeviceAuthenticatio
         catch (IOException e)
         {
             log.error("setSslDomain has thrown an exception", e);
-            throw new TransportException(e);
+            throw new TransportException(e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
         // Codes_SRS_AMQPSDEVICEAUTHENTICATIONCBS_12_014: [The function shall set the domain on the transport.]
         transport.ssl(domain);
@@ -302,7 +308,13 @@ public final class AmqpsDeviceAuthenticationCBS extends AmqpsDeviceAuthenticatio
         catch (IOException e)
         {
             log.error("getRenewedSasToken has thrown exception while building new cbs authentication message", e);
-            throw new TransportException(e);
+            throw new TransportException(e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
 
         return outgoingMessage;

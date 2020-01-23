@@ -419,7 +419,13 @@ public class HttpsIotHubConnection implements IotHubTransportConnection
                         resultStatus.name());
 
                 // Codes_SRS_HTTPSIOTHUBCONNECTION_11_038: [If the IoT Hub status code in the response is not OK_EMPTY, the function shall throw an IotHubServiceException.]
-                throw new IotHubServiceException(errMsg);
+                throw new IotHubServiceException(errMsg) {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return false;
+                    }
+                };
             }
             else
             {
@@ -461,7 +467,13 @@ public class HttpsIotHubConnection implements IotHubTransportConnection
         }
         catch (MalformedURLException e)
         {
-            throw new TransportException("Could not build HTTP url", e);
+            throw new TransportException("Could not build HTTP url", e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
     }
 
@@ -473,7 +485,13 @@ public class HttpsIotHubConnection implements IotHubTransportConnection
         }
         catch (IOException e)
         {
-            throw new TransportException(e);
+            throw new TransportException(e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
     }
 
@@ -485,7 +503,13 @@ public class HttpsIotHubConnection implements IotHubTransportConnection
         }
         catch (IOException e)
         {
-            throw new TransportException(e);
+            throw new TransportException(e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
     }
 

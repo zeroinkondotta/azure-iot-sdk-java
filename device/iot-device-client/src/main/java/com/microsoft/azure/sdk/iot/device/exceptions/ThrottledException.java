@@ -30,6 +30,11 @@ public class ThrottledException extends IotHubServiceException
     }
 
     @Override
+    public boolean isRetryable() {
+        return true;
+    }
+
+    @Override
     public IotHubStatusCode getStatusCode()
     {
         return IotHubStatusCode.THROTTLED;

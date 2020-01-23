@@ -9,7 +9,7 @@ package com.microsoft.azure.sdk.iot.device.exceptions;
  * Exception class that covers all exceptions that occur within transport protocol communication. For example, if a
  * amqp:connection:forced exception is given by AMQP.
  */
-public class ProtocolException extends TransportException
+public abstract class ProtocolException extends TransportException
 {
     public ProtocolException()
     {

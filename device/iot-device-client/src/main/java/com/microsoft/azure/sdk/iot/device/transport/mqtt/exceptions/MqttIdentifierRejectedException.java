@@ -18,24 +18,25 @@ public class MqttIdentifierRejectedException extends ProtocolException
     public MqttIdentifierRejectedException()
     {
         super();
-        this.isRetryable = false;
     }
 
     public MqttIdentifierRejectedException(String message)
     {
         super(message);
-        this.isRetryable = false;
     }
 
     public MqttIdentifierRejectedException(String message, Throwable cause)
     {
         super(message, cause);
-        this.isRetryable = false;
     }
 
     public MqttIdentifierRejectedException(Throwable cause)
     {
         super(cause);
-        this.isRetryable = false;
+    }
+
+    @Override
+    public boolean isRetryable() {
+        return false;
     }
 }

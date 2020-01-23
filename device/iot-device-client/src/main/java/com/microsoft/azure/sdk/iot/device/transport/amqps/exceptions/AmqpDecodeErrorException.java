@@ -35,4 +35,9 @@ public class AmqpDecodeErrorException extends ProtocolException
     {
         super(cause);
     }
+
+    @Override
+    public boolean isRetryable() {
+        return true;
+    }
 }

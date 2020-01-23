@@ -211,14 +211,26 @@ public class MqttDeviceMethod extends Mqtt
 
     private void throwMethodsTransportException(String message) throws TransportException
     {
-        TransportException transportException = new TransportException(message);
+        TransportException transportException = new TransportException(message) {
+
+            @Override
+            public boolean isRetryable() {
+                return false;
+            }
+        };
         transportException.setIotHubService(TransportException.IotHubService.METHODS);
         throw transportException;
     }
 
     private void throwMethodsTransportException(Exception e) throws TransportException
     {
-        TransportException transportException = new TransportException(e);
+        TransportException transportException = new TransportException(e) {
+
+            @Override
+            public boolean isRetryable() {
+                return false;
+            }
+        };
         transportException.setIotHubService(TransportException.IotHubService.METHODS);
         throw transportException;
     }

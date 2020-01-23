@@ -12,25 +12,26 @@ public class TooManyDevicesException extends IotHubServiceException
     public TooManyDevicesException()
     {
         super();
-        this.isRetryable = false;
     }
 
     public TooManyDevicesException(String message)
     {
         super(message);
-        this.isRetryable = false;
     }
 
     public TooManyDevicesException(String message, Throwable cause)
     {
         super(message, cause);
-        this.isRetryable = false;
     }
 
     public TooManyDevicesException(Throwable cause)
     {
         super(cause);
-        this.isRetryable = false;
+    }
+
+    @Override
+    public boolean isRetryable() {
+        return false;
     }
 
     @Override

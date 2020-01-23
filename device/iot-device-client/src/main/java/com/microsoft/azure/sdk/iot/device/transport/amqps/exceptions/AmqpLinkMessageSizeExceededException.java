@@ -35,4 +35,9 @@ public class AmqpLinkMessageSizeExceededException extends ProtocolException
     {
         super(cause);
     }
+
+    @Override
+    public boolean isRetryable() {
+        return true;
+    }
 }

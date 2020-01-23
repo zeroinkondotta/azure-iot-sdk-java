@@ -18,24 +18,25 @@ public class MqttBadUsernameOrPasswordException extends ProtocolException
     public MqttBadUsernameOrPasswordException()
     {
         super();
-        this.isRetryable = false;
     }
 
     public MqttBadUsernameOrPasswordException(String message)
     {
         super(message);
-        this.isRetryable = false;
     }
 
     public MqttBadUsernameOrPasswordException(String message, Throwable cause)
     {
         super(message, cause);
-        this.isRetryable = false;
     }
 
     public MqttBadUsernameOrPasswordException(Throwable cause)
     {
         super(cause);
-        this.isRetryable = false;
+    }
+
+    @Override
+    public boolean isRetryable() {
+        return false;
     }
 }

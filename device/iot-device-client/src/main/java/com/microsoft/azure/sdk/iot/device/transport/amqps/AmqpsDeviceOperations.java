@@ -290,7 +290,13 @@ public abstract class AmqpsDeviceOperations
 
             if (bytesSent != length)
             {
-                ProtocolException amqpSendFailedException = new ProtocolException(String.format("Amqp send operation did not send all of the expected bytes for %s sender link with link correlation id %s, retrying to send the message", getLinkInstanceType(), this.linkCorrelationId));
+                ProtocolException amqpSendFailedException = new ProtocolException(String.format("Amqp send operation did not send all of the expected bytes for %s sender link with link correlation id %s, retrying to send the message", getLinkInstanceType(), this.linkCorrelationId)) {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return true;
+                    }
+                };
                 throw amqpSendFailedException;
             }
 
@@ -299,7 +305,13 @@ public abstract class AmqpsDeviceOperations
 
             if (!canAdvance)
             {
-                ProtocolException amqpSendFailedException = new ProtocolException(String.format("Failed to advance the senderLink after sending a message on %s sender link with link correlation id %s, retrying to send the message", getLinkInstanceType(), this.linkCorrelationId));
+                ProtocolException amqpSendFailedException = new ProtocolException(String.format("Failed to advance the senderLink after sending a message on %s sender link with link correlation id %s, retrying to send the message", getLinkInstanceType(), this.linkCorrelationId)) {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return true;
+                    }
+                };
                 throw amqpSendFailedException;
             }
 

@@ -37,14 +37,25 @@ public class PahoExceptionTranslator
                     // Codes_SRS_PahoExceptionTranslator_34_139: [When deriving the TransportException from the provided
                     // MqttException, this function shall map all client exceptions with underlying UnknownHostException
                     // or InterruptedException or SocketTimeoutException to a retryable ProtocolException.]
-                    ProtocolException connectionException = new ProtocolException(errorMessage, pahoException);
-                    connectionException.setRetryable(true);
+                    ProtocolException connectionException = new ProtocolException(errorMessage, pahoException) {
+
+                        @Override
+                        public boolean isRetryable() {
+                            return true;
+                        }
+                    };
                     return connectionException;
                 }
                 else
                 {
                     //Codes_SRS_PahoExceptionTranslator_34_140: [When deriving the TransportException from the provided MqttException, this function shall map all client exceptions without underlying UnknownHostException and InterruptedException to a non retryable ProtocolException.]
-                    return new ProtocolException(errorMessage, pahoException);
+                    return new ProtocolException(errorMessage, pahoException) {
+
+                        @Override
+                        public boolean isRetryable() {
+                            return false;
+                        }
+                    };
                 }
             case REASON_CODE_INVALID_PROTOCOL_VERSION:
                 // Codes_SRS_PahoExceptionTranslator_34_141: [When deriving the TransportException from the provided MqttException, this function shall map REASON_CODE_INVALID_PROTOCOL_VERSION to MqttRejectedProtocolVersionException.]
@@ -72,8 +83,13 @@ public class PahoExceptionTranslator
             case REASON_CODE_CONNECT_IN_PROGRESS:
                 // Codes_SRS_PahoExceptionTranslator_34_146: [When deriving the TransportException from the provided MqttException, this function shall map REASON_CODE_SUBSCRIBE_FAILED, REASON_CODE_CLIENT_NOT_CONNECTED, REASON_CODE_TOKEN_INUSE, REASON_CODE_CONNECTION_LOST, REASON_CODE_SERVER_CONNECT_ERROR, REASON_CODE_CLIENT_TIMEOUT, REASON_CODE_WRITE_TIMEOUT, and REASON_CODE_MAX_INFLIGHT to a retryable ProtocolException.]
                 //Client lost internet connection, or server could not be reached, or other retryable connection exceptions
-                ProtocolException connectionException = new ProtocolException(errorMessage, pahoException);
-                connectionException.setRetryable(true);
+                ProtocolException connectionException = new ProtocolException(errorMessage, pahoException) {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return true;
+                    }
+                };
                 return connectionException;
             default:
                 if (pahoException.getReasonCode() >= UNDEFINED_MQTT_CONNECT_CODE_LOWER_BOUND && pahoException.getReasonCode() <= UNDEFINED_MQTT_CONNECT_CODE_UPPER_BOUND)
@@ -86,7 +102,13 @@ public class PahoExceptionTranslator
                 {
                     //Mqtt connect code was not MQTT standard code, and was not a retryable exception as defined by Paho
                     //Codes_SRS_PahoExceptionTranslator_34_148: [When deriving the TransportException from the provided MqttException, this function shall map all other MqttExceptions to ProtocolException.]
-                    return new ProtocolException(errorMessage, pahoException);
+                    return new ProtocolException(errorMessage, pahoException) {
+
+                        @Override
+                        public boolean isRetryable() {
+                            return false;
+                        }
+                    };
                 }
         }
     }

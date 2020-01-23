@@ -30,6 +30,11 @@ public class ServerBusyException extends IotHubServiceException
     }
 
     @Override
+    public boolean isRetryable() {
+        return true;
+    }
+
+    @Override
     public IotHubStatusCode getStatusCode()
     {
         return IotHubStatusCode.SERVER_BUSY;

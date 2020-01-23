@@ -181,22 +181,38 @@ abstract public class Mqtt implements MqttCallback
         {
             if (this.mqttConnection.getMqttAsyncClient() == null)
             {
-                TransportException transportException = new TransportException("Need to open first!");
-                transportException.setRetryable(true);
+                TransportException transportException = new TransportException("Need to open first!") {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return true;
+                    }
+                };
                 throw transportException;
             }
 
             if (this.userSpecifiedSASTokenExpiredOnRetry)
             {
                 //Codes_SRS_Mqtt_99_049: [If the user supplied SAS token has expired, the function shall throw a TransportException.]
-                throw new TransportException("Cannot publish when user supplied SAS token has expired");
+                throw new TransportException("Cannot publish when user supplied SAS token has expired") {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return false;
+                    }
+                };
             }
 
             if (!this.mqttConnection.getMqttAsyncClient().isConnected())
             {
                 //Codes_SRS_Mqtt_25_012: [If the MQTT connection is closed, the function shall throw a TransportException.]
-                TransportException transportException = new TransportException("Cannot publish when mqtt client is disconnected");
-                transportException.setRetryable(true);
+                TransportException transportException = new TransportException("Cannot publish when mqtt client is disconnected") {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return true;
+                    }
+                };
                 throw transportException;
             }
 
@@ -215,16 +231,26 @@ abstract public class Mqtt implements MqttCallback
 
                 if (this.mqttConnection.getMqttAsyncClient() == null)
                 {
-                    TransportException transportException = new TransportException("Connection was lost while waiting for mqtt deliveries to finish");
-                    transportException.setRetryable(true);
+                    TransportException transportException = new TransportException("Connection was lost while waiting for mqtt deliveries to finish") {
+
+                        @Override
+                        public boolean isRetryable() {
+                            return true;
+                        }
+                    };
                     throw transportException;
                 }
 
                 if (!this.mqttConnection.getMqttAsyncClient().isConnected())
                 {
                     //Codes_SRS_Mqtt_25_012: [If the MQTT connection is closed, the function shall throw a ProtocolException.]
-                    TransportException transportException = new TransportException("Cannot publish when mqtt client is holding 10 tokens and is disconnected");
-                    transportException.setRetryable(true);
+                    TransportException transportException = new TransportException("Cannot publish when mqtt client is holding 10 tokens and is disconnected") {
+
+                        @Override
+                        public boolean isRetryable() {
+                            return true;
+                        }
+                    };
                     throw transportException;
                 }
             }
@@ -251,7 +277,13 @@ abstract public class Mqtt implements MqttCallback
         }
         catch (InterruptedException e)
         {
-            throw new TransportException("Interrupted, Unable to publish message on topic : " + publishTopic, e);
+            throw new TransportException("Interrupted, Unable to publish message on topic : " + publishTopic, e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
     }
 
@@ -277,14 +309,25 @@ abstract public class Mqtt implements MqttCallback
                 else if (this.userSpecifiedSASTokenExpiredOnRetry)
                 {
                     //Codes_SRS_Mqtt_99_049: [If the user supplied SAS token has expired, the function shall throw a TransportException.]
-                    throw new TransportException("Cannot subscribe when user supplied SAS token has expired");
+                    throw new TransportException("Cannot subscribe when user supplied SAS token has expired") {
+
+                        @Override
+                        public boolean isRetryable() {
+                            return false;
+                        }
+                    };
                 }
                 else if (!this.mqttConnection.getMqttAsyncClient().isConnected())
                 {
 
                     //Codes_SRS_Mqtt_25_015: [If the MQTT connection is closed, the function shall throw a TransportException with message.]
-                    TransportException transportException = new TransportException("Cannot subscribe when mqtt client is disconnected");
-                    transportException.setRetryable(true);
+                    TransportException transportException = new TransportException("Cannot subscribe when mqtt client is disconnected") {
+
+                        @Override
+                        public boolean isRetryable() {
+                            return true;
+                        }
+                    };
                     throw transportException;
                 }
 
@@ -319,7 +362,13 @@ abstract public class Mqtt implements MqttCallback
         {
             if (this.mqttConnection == null)
             {
-                throw new TransportException(new IllegalArgumentException("Mqtt client should be initialised at least once before using it"));
+                throw new TransportException(new IllegalArgumentException("Mqtt client should be initialised at least once before using it")) {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return false;
+                    }
+                };
             }
 
             // Codes_SRS_Mqtt_34_023: [This method shall call peekMessage to get the message payload from the received Messages queue corresponding to the messaging client's operation.]
@@ -341,7 +390,13 @@ abstract public class Mqtt implements MqttCallback
                     else
                     {
                         // Codes_SRS_Mqtt_34_025: [If the call to peekMessage returns null when topic is non-null then this method will throw a TransportException]
-                        throw new TransportException("Data cannot be null when topic is non-null");
+                        throw new TransportException("Data cannot be null when topic is non-null") {
+
+                            @Override
+                            public boolean isRetryable() {
+                                return false;
+                            }
+                        };
                     }
                 }
                 else
@@ -391,7 +446,13 @@ abstract public class Mqtt implements MqttCallback
                 }
                 else
                 {
-                    throwable = new TransportException(throwable);
+                    throwable = new TransportException(throwable) {
+
+                        @Override
+                        public boolean isRetryable() {
+                            return false;
+                        }
+                    };
                 }
             }
             else

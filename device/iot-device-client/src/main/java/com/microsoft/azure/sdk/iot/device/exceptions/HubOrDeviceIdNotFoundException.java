@@ -12,25 +12,26 @@ public class HubOrDeviceIdNotFoundException extends IotHubServiceException
     public HubOrDeviceIdNotFoundException()
     {
         super();
-        this.isRetryable = false;
     }
 
     public HubOrDeviceIdNotFoundException(String message)
     {
         super(message);
-        this.isRetryable = false;
     }
 
     public HubOrDeviceIdNotFoundException(String message, Throwable cause)
     {
         super(message, cause);
-        this.isRetryable = false;
     }
 
     public HubOrDeviceIdNotFoundException(Throwable cause)
     {
         super(cause);
-        this.isRetryable = false;
+    }
+
+    @Override
+    public boolean isRetryable() {
+        return false;
     }
 
     @Override

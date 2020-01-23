@@ -163,7 +163,13 @@ public class MqttMessaging extends Mqtt
         }
         catch (UnsupportedEncodingException e)
         {
-            throw new TransportException("Could not utf-8 encode the mqtt property", e);
+            throw new TransportException("Could not utf-8 encode the mqtt property", e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
     }
 }

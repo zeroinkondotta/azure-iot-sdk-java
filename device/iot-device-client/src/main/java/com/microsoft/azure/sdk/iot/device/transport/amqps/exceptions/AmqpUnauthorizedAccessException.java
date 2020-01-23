@@ -19,24 +19,25 @@ public class AmqpUnauthorizedAccessException extends ProtocolException
     public AmqpUnauthorizedAccessException()
     {
         super();
-        this.isRetryable = false;
     }
 
     public AmqpUnauthorizedAccessException(String message)
     {
         super(message);
-        this.isRetryable = false;
     }
 
     public AmqpUnauthorizedAccessException(String message, Throwable cause)
     {
         super(message, cause);
-        this.isRetryable = false;
     }
 
     public AmqpUnauthorizedAccessException(Throwable cause)
     {
         super(cause);
-        this.isRetryable = false;
+    }
+
+    @Override
+    public boolean isRetryable() {
+        return false;
     }
 }

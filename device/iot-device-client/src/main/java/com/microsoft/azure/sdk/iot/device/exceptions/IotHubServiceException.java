@@ -12,7 +12,7 @@ import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
  * the transport protocols. These exceptions map to standard status codes from the service (401 : unauthorized,
  * 404 : not found, etc.)
  */
-public class IotHubServiceException extends TransportException
+public abstract class IotHubServiceException extends TransportException
 {
     public IotHubServiceException()
     {

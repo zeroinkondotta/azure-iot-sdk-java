@@ -19,24 +19,25 @@ public class AmqpPreconditionFailedException extends ProtocolException
     public AmqpPreconditionFailedException()
     {
         super();
-        this.isRetryable = false;
     }
 
     public AmqpPreconditionFailedException(String message)
     {
         super(message);
-        this.isRetryable = false;
     }
 
     public AmqpPreconditionFailedException(String message, Throwable cause)
     {
         super(message, cause);
-        this.isRetryable = false;
     }
 
     public AmqpPreconditionFailedException(Throwable cause)
     {
         super(cause);
-        this.isRetryable = false;
+    }
+
+    @Override
+    public boolean isRetryable() {
+        return false;
     }
 }

@@ -242,7 +242,13 @@ public final class AmqpsIotHubConnection extends ErrorLoggingBaseHandler impleme
             {
                 executorServicesCleanup();
                 log.error("Interrupted while waiting for links to open for AMQP connection", e);
-                throw new TransportException("Interrupted while waiting for links to open for AMQP connection", e);
+                throw new TransportException("Interrupted while waiting for links to open for AMQP connection", e) {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return false;
+                    }
+                };
             }
         }
 
@@ -283,10 +289,15 @@ public final class AmqpsIotHubConnection extends ErrorLoggingBaseHandler impleme
         this.log.trace("Initializing authentication links authorized latch count to {}", deviceCount);
     }
 
-    private void closeConnectionWithException(String errorMessage, boolean isRetryable) throws TransportException
+    private void closeConnectionWithException(String errorMessage, final boolean isRetryable) throws TransportException
     {
-        TransportException transportException = new TransportException(errorMessage);
-        transportException.setRetryable(isRetryable);
+        TransportException transportException = new TransportException(errorMessage) {
+
+            @Override
+            public boolean isRetryable() {
+                return isRetryable;
+            }
+        };
         this.log.error(errorMessage, transportException);
 
         this.close();
@@ -352,7 +363,13 @@ public final class AmqpsIotHubConnection extends ErrorLoggingBaseHandler impleme
         {
             // Codes_SRS_AMQPSIOTHUBCONNECTION_12_004: [The function shall TransportException throws if the waitLock throws.]
             log.warn("Interrupted while closing proton reactor", e);
-            throw new TransportException("Waited too long for the connection to close.", e);
+            throw new TransportException("Waited too long for the connection to close.", e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
 
         this.executorServicesCleanup();
@@ -389,7 +406,13 @@ public final class AmqpsIotHubConnection extends ErrorLoggingBaseHandler impleme
                 // (Re-)Cancel if current thread also interrupted
                 this.executorService.shutdownNow();
                 this.executorService = null;
-                throw new TransportException("Waited too long for the connection to close.", e);
+                throw new TransportException("Waited too long for the connection to close.", e) {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return false;
+                    }
+                };
             }
             log.trace("Shutdown of executor service completed");
         }
@@ -674,7 +697,13 @@ public final class AmqpsIotHubConnection extends ErrorLoggingBaseHandler impleme
                             else
                             {
                                 // Codes_SRS_AMQPSIOTHUBCONNECTION_34_065: [If the acknowledgement sent from the service is "Rejected", this function shall notify its listener that the sent message was rejected and that it should not be retried.]
-                                transportException = new TransportException("IotHub rejected the message");
+                                transportException = new TransportException("IotHub rejected the message") {
+
+                                    @Override
+                                    public boolean isRetryable() {
+                                        return false;
+                                    }
+                                };
                             }
 
                             this.listener.onMessageSent(inProgressMessages.remove(deliveryTag), transportException);
@@ -685,15 +714,26 @@ public final class AmqpsIotHubConnection extends ErrorLoggingBaseHandler impleme
                             this.log.trace("AMQP connection received Modified, Released or Received acknowledgement for iot hub message  ({})", acknowledgedMessage);
 
                             // Codes_SRS_AMQPSIOTHUBCONNECTION_34_066: [If the acknowledgement sent from the service is "Modified", "Released", or "Received", this function shall notify its listener that the sent message needs to be retried.]
-                            TransportException transportException = new TransportException("IotHub responded to message with Modified, Received or Released; message needs to be re-delivered");
-                            transportException.setRetryable(true);
+                            TransportException transportException = new TransportException("IotHub responded to message with Modified, Received or Released; message needs to be re-delivered") {
+
+                                @Override
+                                public boolean isRetryable() {
+                                    return true;
+                                }
+                            };
                             this.listener.onMessageSent(inProgressMessages.remove(deliveryTag), transportException);
                         }
                     }
                     else
                     {
                         this.log.warn("Unable to correlate acknowledgement with delivery tag {} to a sent message, ignoring it", deliveryTag);
-                        this.listener.onMessageReceived(null, new TransportException("Received response from service about a message that this client did not send"));
+                        this.listener.onMessageReceived(null, new TransportException("Received response from service about a message that this client did not send") {
+
+                            @Override
+                            public boolean isRetryable() {
+                                return false;
+                            }
+                        });
                     }
                 }
                 else
@@ -976,7 +1016,13 @@ public final class AmqpsIotHubConnection extends ErrorLoggingBaseHandler impleme
         }
         catch (IOException e)
         {
-            throw new TransportException("Could not create Proton reactor", e);
+            throw new TransportException("Could not create Proton reactor", e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return true;
+                }
+            };
         }
     }
 
@@ -1017,7 +1063,13 @@ public final class AmqpsIotHubConnection extends ErrorLoggingBaseHandler impleme
         if (amqpsHandleMessageReturnValue.getMessageCallback() == null)
         {
             log.warn("Callback is not defined therefore response to IoT Hub cannot be generated. All received messages will be removed from receive message queue");
-            throw new TransportException("callback is not defined");
+            throw new TransportException("callback is not defined") {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
 
         IotHubTransportMessage transportMessage = amqpsHandleMessageReturnValue.getMessage();
@@ -1094,7 +1146,13 @@ public final class AmqpsIotHubConnection extends ErrorLoggingBaseHandler impleme
                 }
                 catch (NumberFormatException nfe)
                 {
-                    this.savedException = new TransportException("Encountered message from service with invalid status code value");
+                    this.savedException = new TransportException("Encountered message from service with invalid status code value") {
+
+                        @Override
+                        public boolean isRetryable() {
+                            return false;
+                        }
+                    };
                     log.error("status code received from service on cbs link could not be parsed to integer {}", statusCodeString);
                 }
             }
@@ -1272,8 +1330,13 @@ public final class AmqpsIotHubConnection extends ErrorLoggingBaseHandler impleme
 
         if (transportException == null)
         {
-            transportException = new TransportException("Unknown transport exception occurred");
-            transportException.setRetryable(true);
+            transportException = new TransportException("Unknown transport exception occurred") {
+
+                @Override
+                public boolean isRetryable() {
+                    return true;
+                }
+            };
         }
 
         return transportException;
@@ -1353,7 +1416,13 @@ public final class AmqpsIotHubConnection extends ErrorLoggingBaseHandler impleme
             }
             catch (HandlerException e)
             {
-                this.listener.onConnectionLost(new TransportException(e), connectionId);
+                this.listener.onConnectionLost(new TransportException(e) {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return false;
+                    }
+                }, connectionId);
             }
 
             return null;

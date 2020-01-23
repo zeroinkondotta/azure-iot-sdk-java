@@ -67,7 +67,13 @@ public enum IotHubStatusCode
                 transportException = new ServiceUnknownException("Service gave unknown status code: " + statusCode);
                 break;
             default:
-                transportException = new IotHubServiceException("Service gave unknown status code: " + statusCode);
+                transportException = new IotHubServiceException("Service gave unknown status code: " + statusCode) {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return true;
+                    }
+                };
         }
 
         return transportException;

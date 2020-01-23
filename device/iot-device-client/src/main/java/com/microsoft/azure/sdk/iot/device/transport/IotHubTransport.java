@@ -137,7 +137,14 @@ public class IotHubTransport implements IotHubListener
                     // the provided message, and the provided throwable is not a TransportException, this function
                     // shall call "handleMessageException" with the provided packet and a new transport exception with
                     // the provided exception as the inner exception.]
-                    this.handleMessageException(packet, new TransportException(e));
+                    TransportException exception = new TransportException(e) {
+
+                        @Override
+                        public boolean isRetryable() {
+                            return true;
+                        }
+                    };
+                    this.handleMessageException(packet, exception);
                 }
             }
         }
@@ -205,7 +212,13 @@ public class IotHubTransport implements IotHubListener
                 //Codes_SRS_IOTHUBTRANSPORT_34_013: [If this function is called with any other type of exception, this
                 // function shall call handleDisconnection with that exception as the inner exception in a new
                 // TransportException.]
-                this.handleDisconnection(new TransportException(e));
+                this.handleDisconnection(new TransportException(e) {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return true;
+                    }
+                });
             }
         }
     }
@@ -255,7 +268,13 @@ public class IotHubTransport implements IotHubListener
         {
             //Codes_SRS_IOTHUBTRANSPORT_34_016: [If the connection status of this object is DISCONNECTED_RETRYING, this
             // function shall throw a TransportException.]
-            throw new TransportException("Open cannot be called while transport is reconnecting");
+            throw new TransportException("Open cannot be called while transport is reconnecting") {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
 
         if (this.isSasTokenExpired())
@@ -696,7 +715,13 @@ public class IotHubTransport implements IotHubListener
                     this.iotHubTransportConnection = new AmqpsIotHubConnection(defaultConfig);
                     break;
                 default:
-                    throw new TransportException("Protocol not supported");
+                    throw new TransportException("Protocol not supported") {
+
+                        @Override
+                        public boolean isRetryable() {
+                            return false;
+                        }
+                    };
             }
         }
 
@@ -1191,7 +1216,9 @@ public class IotHubTransport implements IotHubListener
                 || transportException instanceof AmqpUnauthorizedAccessException))
         {
             //Device key is present, sas token will be renewed upon re-opening the connection
-            transportException.setRetryable(true);
+
+            // TODO - 685 - Handle scenario where sas token should be renewed on re-opening connection
+            // transportException.setRetryable(true);
         }
     }
 }

@@ -210,7 +210,13 @@ public class MqttIotHubConnection implements IotHubTransportConnection, MqttMess
                 {
                     this.deviceMessaging.stop();
                 }
-                throw new TransportException(e);
+                throw new TransportException(e) {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return false;
+                    }
+                };
             }
         }
     }
@@ -383,7 +389,13 @@ public class MqttIotHubConnection implements IotHubTransportConnection, MqttMess
         if (message == null || result == null)
         {
             //Codes_SRS_MQTTIOTHUBCONNECTION_34_057: [If the provided message or result is null, this function shall throw a TransportException.]
-            throw new TransportException(new IllegalArgumentException("message and result must be non-null"));
+            throw new TransportException(new IllegalArgumentException("message and result must be non-null")) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
 
         int messageId;
@@ -395,7 +407,13 @@ public class MqttIotHubConnection implements IotHubTransportConnection, MqttMess
         }
         else
         {
-            TransportException e = new TransportException(new IllegalArgumentException("Provided message cannot be acknowledged because it was already acknowledged or was never received from service"));
+            TransportException e = new TransportException(new IllegalArgumentException("Provided message cannot be acknowledged because it was already acknowledged or was never received from service")) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
             this.log.error("Mqtt layer could not acknowledge received message because it has no mapping to an outstanding mqtt message id ({})", message, e);
             //Codes_SRS_MQTTIOTHUBCONNECTION_34_051: [If this object has not received the provided message from the service, this function shall throw a TransportException.]
             throw e;
@@ -449,14 +467,26 @@ public class MqttIotHubConnection implements IotHubTransportConnection, MqttMess
         }
         catch (TransportException e)
         {
-            this.listener.onMessageReceived(null, new TransportException("Failed to receive message from service", e));
+            this.listener.onMessageReceived(null, new TransportException("Failed to receive message from service", e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            });
             this.log.error("Encountered exception while receiving message over MQTT", e);
         }
 
         if (transportMessage == null)
         {
             //Ack is not sent to service for this message because we cannot interpret the message. Service will likely re-send
-            this.listener.onMessageReceived(null, new TransportException("Message sent from service could not be parsed"));
+            this.listener.onMessageReceived(null, new TransportException("Message sent from service could not be parsed") {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            });
             this.log.warn("Received message that could not be parsed. That message has been ignored.");
         }
         else

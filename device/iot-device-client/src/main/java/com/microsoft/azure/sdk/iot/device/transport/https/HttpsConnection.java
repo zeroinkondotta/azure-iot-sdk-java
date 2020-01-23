@@ -155,11 +155,23 @@ public class HttpsConnection
         catch (java.net.ProtocolException e)
         {
             // should never happen, since the method names are hard-coded.
-            throw new TransportException(e);
+            throw new TransportException(e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
         catch (SecurityException e)
         {
-            throw new TransportException(e);
+            throw new TransportException(e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
     }
 
@@ -392,14 +404,20 @@ public class HttpsConnection
 
     private static TransportException buildTransportException(IOException e)
     {
-        TransportException transportException = new TransportException(e);
-
+        boolean isRetryable = false;
         if (e instanceof NoRouteToHostException || e instanceof UnknownHostException)
         {
-            transportException.setRetryable(true);
+            isRetryable = true;
         }
 
-        return transportException;
+        final boolean finalIsRetryable = isRetryable;
+        return new TransportException(e) {
+
+            @Override
+            public boolean isRetryable() {
+                return finalIsRetryable;
+            }
+        };
     }
 
     /**

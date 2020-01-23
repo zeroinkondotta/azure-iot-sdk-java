@@ -20,14 +20,26 @@ public class TransportUtils
 
     public static void throwTransportExceptionWithIotHubServiceType(String message, TransportException.IotHubService service) throws TransportException
     {
-        TransportException transportException = new TransportException(message);
+        TransportException transportException = new TransportException(message) {
+
+            @Override
+            public boolean isRetryable() {
+                return false;
+            }
+        };
         transportException.setIotHubService(service);
         throw transportException;
     }
 
     public static void throwTransportExceptionWithIotHubServiceType(Exception e, TransportException.IotHubService service) throws TransportException
     {
-        TransportException transportException = new TransportException(e);
+        TransportException transportException = new TransportException(e) {
+
+            @Override
+            public boolean isRetryable() {
+                return false;
+            }
+        };
         transportException.setIotHubService(service);
         throw transportException;
     }

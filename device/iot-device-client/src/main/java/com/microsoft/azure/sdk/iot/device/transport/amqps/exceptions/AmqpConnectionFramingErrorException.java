@@ -35,4 +35,9 @@ public class AmqpConnectionFramingErrorException extends ProtocolException
     {
         super(cause);
     }
+
+    @Override
+    public boolean isRetryable() {
+        return true;
+    }
 }

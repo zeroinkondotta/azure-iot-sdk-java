@@ -30,6 +30,11 @@ public class RequestEntityTooLargeException extends IotHubServiceException
     }
 
     @Override
+    public boolean isRetryable() {
+        return false;
+    }
+
+    @Override
     public IotHubStatusCode getStatusCode()
     {
         return IotHubStatusCode.REQUEST_ENTITY_TOO_LARGE;

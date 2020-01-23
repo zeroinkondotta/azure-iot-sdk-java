@@ -19,7 +19,13 @@ public class TopicParser
         if (topic == null || topic.length() == 0)
         {
             //Codes_SRS_TopicParser_25_002: [The constructor shall throw TransportException if topic is null or empty.]
-            throw new TransportException(new IllegalArgumentException("topic cannot be null or empty"));
+            throw new TransportException(new IllegalArgumentException("topic cannot be null or empty")) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
 
         //Codes_SRS_TopicParser_25_001: [The constructor shall spilt the topic by "/" and save the tokens.]
@@ -33,7 +39,13 @@ public class TopicParser
         if (tokenIndexStatus <= 0 || tokenIndexStatus >= topicTokens.length)
         {
             //Codes_SRS_TopicParser_25_003: [If tokenIndexStatus is not valid i.e less than or equal to zero or greater then token length then getStatus shall throw TransportException.]
-            throw new TransportException(new IllegalArgumentException("Invalid token Index for status"));
+            throw new TransportException(new IllegalArgumentException("Invalid token Index for status")) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
 
         if (topicTokens.length > tokenIndexStatus)
@@ -48,7 +60,13 @@ public class TopicParser
             else
             {
                 //Codes_SRS_TopicParser_25_005: [If token corresponding to tokenIndexStatus is null then this method shall throw TransportException.]
-                throw new TransportException("Status could not be parsed");
+                throw new TransportException("Status could not be parsed") {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return false;
+                    }
+                };
             }
         }
 
@@ -62,7 +80,13 @@ public class TopicParser
         if (tokenIndexReqID <= 0 || tokenIndexReqID >= topicTokens.length)
         {
             //Codes_SRS_TopicParser_25_006: [If tokenIndexReqID is not valid i.e less than or equal to zero or greater then token length then getRequestId shall throw TransportException.]
-            throw new TransportException(new IllegalArgumentException("Invalid token Index for request id"));
+            throw new TransportException(new IllegalArgumentException("Invalid token Index for request id")) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
 
         if (topicTokens.length > tokenIndexReqID)
@@ -96,7 +120,13 @@ public class TopicParser
         if (tokenIndexVersion <= 0 || tokenIndexVersion >= topicTokens.length)
         {
             //Codes_SRS_TopicParser_25_009: [If tokenIndexVersion is not valid i.e less than or equal to zero or greater then token length then getVersion shall throw TranpsortException.]
-            throw new TransportException(new IllegalArgumentException("Invalid token Index for Version"));
+            throw new TransportException(new IllegalArgumentException("Invalid token Index for Version")) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
 
         if (topicTokens.length > tokenIndexVersion)
@@ -130,7 +160,13 @@ public class TopicParser
         if (tokenIndexMethod <= 0 || tokenIndexMethod >= topicTokens.length)
         {
             //Codes_SRS_TopicParser_25_012: [If tokenIndexMethod is not valid i.e less than or equal to zero or greater then token length then getMethodName shall throw TransportException.]
-            throw new TransportException(new IllegalArgumentException("Invalid token Index for Method Name"));
+            throw new TransportException(new IllegalArgumentException("Invalid token Index for Method Name")) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
 
         if (topicTokens.length > tokenIndexMethod)
@@ -145,7 +181,13 @@ public class TopicParser
             }
             else
             {
-                throw new TransportException(new IllegalArgumentException("method name could not be parsed"));
+                throw new TransportException(new IllegalArgumentException("method name could not be parsed")) {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return false;
+                    }
+                };
             }
         }
 

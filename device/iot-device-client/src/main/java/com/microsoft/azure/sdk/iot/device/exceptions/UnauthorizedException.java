@@ -12,25 +12,26 @@ public class UnauthorizedException extends IotHubServiceException
     public UnauthorizedException()
     {
         super();
-        this.isRetryable = false;
     }
 
     public UnauthorizedException(String message)
     {
         super(message);
-        this.isRetryable = false;
     }
 
     public UnauthorizedException(String message, Throwable cause)
     {
         super(message, cause);
-        this.isRetryable = false;
     }
 
     public UnauthorizedException(Throwable cause)
     {
         super(cause);
-        this.isRetryable = false;
+    }
+
+    @Override
+    public boolean isRetryable() {
+        return false;
     }
 
     @Override

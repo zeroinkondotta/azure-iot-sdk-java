@@ -35,4 +35,9 @@ public class AmqpInvalidFieldException extends ProtocolException
     {
         super(cause);
     }
+
+    @Override
+    public boolean isRetryable() {
+        return true;
+    }
 }

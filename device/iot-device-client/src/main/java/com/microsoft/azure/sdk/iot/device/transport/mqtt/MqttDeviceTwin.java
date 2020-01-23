@@ -322,7 +322,13 @@ public class MqttDeviceTwin extends Mqtt
                             }
                             else
                             {
-                                this.throwDeviceTwinTransportException(new IotHubServiceException("Message received without status"));
+                                this.throwDeviceTwinTransportException(new IotHubServiceException("Message received without status") {
+
+                                    @Override
+                                    public boolean isRetryable() {
+                                        return false;
+                                    }
+                                });
                             }
 
                             if (topicTokens.length > REQID_TOKEN)
@@ -407,14 +413,26 @@ public class MqttDeviceTwin extends Mqtt
 
     private void throwDeviceTwinTransportException(String message) throws TransportException
     {
-        TransportException transportException = new TransportException(message);
+        TransportException transportException = new TransportException(message) {
+
+            @Override
+            public boolean isRetryable() {
+                return false;
+            }
+        };
         transportException.setIotHubService(TransportException.IotHubService.TWIN);
         throw transportException;
     }
 
     private void throwDeviceTwinTransportException(Exception e) throws TransportException
     {
-        TransportException transportException = new TransportException(e);
+        TransportException transportException = new TransportException(e) {
+
+            @Override
+            public boolean isRetryable() {
+                return false;
+            }
+        };
         transportException.setIotHubService(TransportException.IotHubService.TWIN);
         throw transportException;
     }

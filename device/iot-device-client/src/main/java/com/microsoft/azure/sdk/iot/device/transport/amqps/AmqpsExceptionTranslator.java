@@ -95,7 +95,13 @@ public class AmqpsExceptionTranslator
                 return  new ProtonIOException(description);
             default:
                 // Codes_SRS_AMQPSEXCEPTIONTRANSLATOR_34_026: [The function shall map all other amqp exception codes to the generic TransportException "ProtocolException".]
-                return new ProtocolException(description);
+                return new ProtocolException(description) {
+
+                    @Override
+                    public boolean isRetryable() {
+                        return true;
+                    }
+                };
         }
     }
 }

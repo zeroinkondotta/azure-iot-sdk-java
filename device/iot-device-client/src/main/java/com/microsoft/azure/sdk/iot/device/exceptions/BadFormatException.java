@@ -30,6 +30,11 @@ public class BadFormatException extends IotHubServiceException
     }
 
     @Override
+    public boolean isRetryable() {
+        return false;
+    }
+
+    @Override
     public IotHubStatusCode getStatusCode()
     {
         return IotHubStatusCode.BAD_FORMAT;

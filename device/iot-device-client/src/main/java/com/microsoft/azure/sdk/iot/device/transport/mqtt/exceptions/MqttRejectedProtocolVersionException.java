@@ -18,24 +18,25 @@ public class MqttRejectedProtocolVersionException extends ProtocolException
     public MqttRejectedProtocolVersionException()
     {
         super();
-        this.isRetryable = false;
     }
 
     public MqttRejectedProtocolVersionException(String message)
     {
         super(message);
-        this.isRetryable = false;
     }
 
     public MqttRejectedProtocolVersionException(String message, Throwable cause)
     {
         super(message, cause);
-        this.isRetryable = false;
     }
 
     public MqttRejectedProtocolVersionException(Throwable cause)
     {
         super(cause);
-        this.isRetryable = false;
+    }
+
+    @Override
+    public boolean isRetryable() {
+        return false;
     }
 }

@@ -35,4 +35,9 @@ public class AmqpSessionErrantLinkException extends ProtocolException
     {
         super(cause);
     }
+
+    @Override
+    public boolean isRetryable() {
+        return true;
+    }
 }

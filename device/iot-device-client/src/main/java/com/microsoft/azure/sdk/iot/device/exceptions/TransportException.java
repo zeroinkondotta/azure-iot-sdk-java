@@ -7,10 +7,8 @@ package com.microsoft.azure.sdk.iot.device.exceptions;
 
 import static com.microsoft.azure.sdk.iot.device.exceptions.TransportException.IotHubService.NOT_APPLICABLE;
 
-public class TransportException extends DeviceClientException
+public abstract class TransportException extends DeviceClientException
 {
-    protected boolean isRetryable = true;
-
     public enum IotHubService
     {
         TWIN,
@@ -42,15 +40,7 @@ public class TransportException extends DeviceClientException
         super(cause);
     }
 
-    public boolean isRetryable()
-    {
-        return this.isRetryable;
-    }
-
-    public void setRetryable(boolean isRetryable)
-    {
-        this.isRetryable = isRetryable;
-    }
+    public abstract boolean isRetryable();
 
     public IotHubService getIotHubService()
     {

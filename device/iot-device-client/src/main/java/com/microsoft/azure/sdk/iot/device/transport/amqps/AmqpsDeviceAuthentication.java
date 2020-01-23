@@ -42,7 +42,13 @@ public abstract class AmqpsDeviceAuthentication extends AmqpsDeviceOperations
         catch (ProtonUnsupportedOperationException e)
         {
             log.warn("Encountered an exception while making ssl domain for amqp connection", e);
-            throw new TransportException(e);
+            throw new TransportException(e) {
+
+                @Override
+                public boolean isRetryable() {
+                    return false;
+                }
+            };
         }
 
         return domain;
@@ -77,12 +83,24 @@ public abstract class AmqpsDeviceAuthentication extends AmqpsDeviceOperations
     @Override
     protected AmqpsConvertFromProtonReturnValue convertFromProton(AmqpsMessage amqpsMessage, DeviceClientConfig deviceClientConfig) throws TransportException
     {
-        throw new TransportException("Should not be called");
+        throw new TransportException("Should not be called") {
+
+            @Override
+            public boolean isRetryable() {
+                return false;
+            }
+        };
     }
 
     @Override
     protected AmqpsConvertToProtonReturnValue convertToProton(Message message) throws TransportException
     {
-        throw new TransportException("Should not be called");
+        throw new TransportException("Should not be called") {
+
+            @Override
+            public boolean isRetryable() {
+                return false;
+            }
+        };
     }
 }

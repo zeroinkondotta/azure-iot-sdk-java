@@ -18,24 +18,25 @@ public class MqttUnauthorizedException extends ProtocolException
     public MqttUnauthorizedException()
     {
         super();
-        this.isRetryable = false;
     }
 
     public MqttUnauthorizedException(String message)
     {
         super(message);
-        this.isRetryable = false;
     }
 
     public MqttUnauthorizedException(String message, Throwable cause)
     {
         super(message, cause);
-        this.isRetryable = false;
     }
 
     public MqttUnauthorizedException(Throwable cause)
     {
         super(cause);
-        this.isRetryable = false;
+    }
+
+    @Override
+    public boolean isRetryable() {
+        return false;
     }
 }

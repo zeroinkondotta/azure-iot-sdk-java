@@ -527,10 +527,10 @@ public class MqttMessagingTest
         final String userId = "test-user-id";
         final String to = "test-to";
         final String outputName = "outputName";
-        final String contentType = "application/json";
+        final String contentType = URLEncoder.encode("application/json", StandardCharsets.UTF_8.name());
         final String contentTypeEncoded = URLEncoder.encode(contentType, StandardCharsets.UTF_8.name());
-        final String contentEncoding = "utf-8";
-        final String creationTimeUtc = "2008-10-01T17:04:32.0000000";
+        final String contentEncoding = URLEncoder.encode("utf-8", StandardCharsets.UTF_8.name());
+        final String creationTimeUtc = URLEncoder.encode("2008-10-01T17:04:32.0000000", StandardCharsets.UTF_8.name());
         final String creationTimeUtcEncoded = URLEncoder.encode(creationTimeUtc, StandardCharsets.UTF_8.name());
         final MessageProperty[] messageProperties = new MessageProperty[]
                 {

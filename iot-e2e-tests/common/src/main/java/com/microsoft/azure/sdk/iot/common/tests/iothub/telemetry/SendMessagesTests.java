@@ -7,7 +7,10 @@ package com.microsoft.azure.sdk.iot.common.tests.iothub.telemetry;
 
 import com.microsoft.azure.sdk.iot.common.helpers.*;
 import com.microsoft.azure.sdk.iot.common.setup.iothub.SendMessagesCommon;
-import com.microsoft.azure.sdk.iot.device.*;
+import com.microsoft.azure.sdk.iot.device.DeviceClient;
+import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
+import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
+import com.microsoft.azure.sdk.iot.device.Message;
 import com.microsoft.azure.sdk.iot.service.Device;
 import com.microsoft.azure.sdk.iot.service.auth.AuthenticationType;
 import com.microsoft.azure.sdk.iot.service.exceptions.IotHubException;
@@ -25,7 +28,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.microsoft.azure.sdk.iot.common.helpers.SasTokenGenerator.generateSasTokenForIotDevice;
 import static com.microsoft.azure.sdk.iot.device.IotHubClientProtocol.*;
 import static com.microsoft.azure.sdk.iot.service.auth.AuthenticationType.*;
-import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 
 /**
@@ -65,6 +67,35 @@ public class SendMessagesTests extends SendMessagesCommon
         this.testInstance.setup();
 
         IotHubServicesCommon.sendMessages(testInstance.client, testInstance.protocol, NORMAL_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, 0, null);
+    }
+
+    @Test
+    public void sendMessagesWithUnusualApplicationProperties() throws Exception
+    {
+        this.testInstance.setup();
+
+        this.testInstance.client.open();
+        Message msg = new Message("asdf");
+        msg.setProperty("TestKey1234!#$%&'*+-^_`|~", "TestValue1234!#$%&'*+-^_`|~");
+        Success messageSentSuccessfully = new Success();
+        this.testInstance.client.sendEventAsync(msg, new EventCallback(IotHubStatusCode.OK_EMPTY), messageSentSuccessfully);
+
+        long messageSendTimeout = 1000 * 15; //15 seconds timeout
+        long startTime = System.currentTimeMillis();
+        while (!messageSentSuccessfully.wasCallbackFired())
+        {
+            if (System.currentTimeMillis() - startTime > messageSendTimeout)
+            {
+                fail("Test timed out waiting for message to be sent");
+            }
+        }
+
+        if (!messageSentSuccessfully.getResult())
+        {
+            fail("Message should have been acknowledged with OK_EMPTY but was " + messageSentSuccessfully.getCallbackStatusCode());
+        }
+
+        this.testInstance.client.closeNow();
     }
 
     @Test

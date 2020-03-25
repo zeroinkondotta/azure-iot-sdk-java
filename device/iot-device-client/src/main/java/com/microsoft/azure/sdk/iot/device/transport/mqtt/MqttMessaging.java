@@ -7,6 +7,8 @@ import com.microsoft.azure.sdk.iot.device.Message;
 import com.microsoft.azure.sdk.iot.device.MessageProperty;
 import com.microsoft.azure.sdk.iot.device.exceptions.TransportException;
 import com.microsoft.azure.sdk.iot.device.transport.IotHubListener;
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -154,16 +156,16 @@ public class MqttMessaging extends Mqtt
 
                 stringBuilder.append(propertyKey);
                 stringBuilder.append(MESSAGE_PROPERTY_KEY_VALUE_SEPARATOR);
-                stringBuilder.append(URLEncoder.encode(propertyValue, StandardCharsets.UTF_8.name()));
+                stringBuilder.append(URIUtil.encodePath(propertyValue, StandardCharsets.UTF_8.name()));
 
                 return true;
             }
 
             return separatorNeeded;
         }
-        catch (UnsupportedEncodingException e)
+        catch (URIException e)
         {
-            throw new TransportException("Could not utf-8 encode the mqtt property", e);
+            throw new TransportException("Could not utf-8 encode the application property with name " + propertyKey + " and value " + propertyValue, e);
         }
     }
 }

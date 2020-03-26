@@ -32,7 +32,7 @@ public final class MessageProperty {
     public static final String IOTHUB_SECURITY_INTERFACE_ID_VALUE = "urn:azureiot:Security:SecurityAgent:1";
 
     //Note this list includes the characters for tab and space.
-    private static final String BANNED_NON_ALPHANUMERIC_CHARACTERS = "()<>@,;:\"/\\[]?={} \t";
+    private static final String BANNED_NON_ALPHANUMERIC_CHARACTERS = "()<>@,;:\"\\[]?={} \t";
     private static final int ASCII_LOWER_BOUND = 32;
     private static final int ASCII_UPPER_BOUND = 127;
 
